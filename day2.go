@@ -1,0 +1,89 @@
+package main
+
+import (
+	"math"
+	"strconv"
+	"strings"
+)
+
+func rep(x int64, reps int) int64 {
+	var mag int64 = 10
+	for mag <= x {
+		mag *= 10
+	}
+	var mult int64 = mag
+	var res int64 = x
+	for i := 0; i < reps-1; i++ {
+		res += x * mult
+		mult *= mag
+	}
+	return res
+}
+
+func nextBase(x int64, reps int) int64 {
+	var lo int64 = 1
+	var hi int64 = 1
+	for rep(hi, reps) < x {
+		hi *= 2
+	}
+	for lo < hi {
+		m := (lo + hi) >> 1
+		if rep(m, reps) >= x {
+			hi = m
+		} else {
+			lo = m + 1
+		}
+	}
+	return lo
+}
+
+func Day2A(io *IO) {
+	var line string
+	io.Read(&line)
+	input := strings.Split(line, ",")
+	itvs := make([]Pair[int64, int64], 0, len(input))
+	for _, itv := range input {
+		segs := strings.Split(itv, "-")
+		lo, _ := strconv.ParseInt(segs[0], 10, 64)
+		hi, _ := strconv.ParseInt(segs[1], 10, 64)
+		itvs = append(itvs, Pair[int64, int64]{First: lo, Second: hi})
+	}
+	var res int64 = 0
+	for _, itv := range itvs {
+		start := nextBase(itv.First, 2)
+		end := nextBase(itv.Second+1, 2)
+		for half := start; half < end; half++ {
+			res += rep(half, 2)
+		}
+	}
+	io.Write("%d\n", res)
+}
+
+func Day2B(io *IO) {
+	var line string
+	io.Read(&line)
+	input := strings.Split(line, ",")
+	itvs := make([]Pair[int64, int64], 0, len(input))
+	for _, itv := range input {
+		segs := strings.Split(itv, "-")
+		lo, _ := strconv.ParseInt(segs[0], 10, 64)
+		hi, _ := strconv.ParseInt(segs[1], 10, 64)
+		itvs = append(itvs, Pair[int64, int64]{First: lo, Second: hi})
+	}
+	var res int64 = 0
+	for _, itv := range itvs {
+		repCap := int(math.Ceil(math.Log10(float64(itv.Second))))
+		seen := make(set[int64])
+		for reps := 2; reps <= repCap; reps++ {
+			start := nextBase(itv.First, reps)
+			end := nextBase(itv.Second+1, reps)
+			for half := start; half < end; half++ {
+				val := rep(half, reps)
+				if seen.Insert(val) {
+					res += val
+				}
+			}
+		}
+	}
+	io.Write("%d\n", res)
+}

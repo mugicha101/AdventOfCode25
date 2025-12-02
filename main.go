@@ -76,6 +76,9 @@ func main() {
 		"day1":  {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}},
 		"day1a": {Call{f: Day1A, input: "day1"}},
 		"day1b": {Call{f: Day1B, input: "day1"}},
+		"day2":  {Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}},
+		"day2a": {Call{f: Day2A, input: "day2"}},
+		"day2b": {Call{f: Day2B, input: "day2"}},
 	}
 	fs, ok := dayMap[target]
 	if ok {
