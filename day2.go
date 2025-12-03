@@ -24,6 +24,7 @@ func nextBase(x int64, reps int) int64 {
 	var lo int64 = 1
 	var hi int64 = 1
 	for rep(hi, reps) < x {
+		lo = hi
 		hi *= 2
 	}
 	for lo < hi {
