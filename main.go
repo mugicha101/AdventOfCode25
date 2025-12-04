@@ -73,7 +73,7 @@ func main() {
 	}
 	target := strings.ToLower(args[1])
 	dayMap := map[string][]Call{
-		"all":   {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}, Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}, Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}},
+		"all":   {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}, Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}, Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}, Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}},
 		"day1":  {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}},
 		"day1a": {Call{f: Day1A, input: "day1"}},
 		"day1b": {Call{f: Day1B, input: "day1"}},
@@ -83,6 +83,9 @@ func main() {
 		"day3":  {Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}},
 		"day3a": {Call{f: Day3A, input: "day3"}},
 		"day3b": {Call{f: Day3B, input: "day3"}},
+		"day4":  {Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}},
+		"day4a": {Call{f: Day4A, input: "day4"}},
+		"day4b": {Call{f: Day4B, input: "day4"}},
 	}
 	fs, ok := dayMap[target]
 	if ok {
