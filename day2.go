@@ -74,7 +74,7 @@ func Day2B(io *IO) {
 	var res int64 = 0
 	for _, itv := range itvs {
 		repCap := int(math.Ceil(math.Log10(float64(itv.Second))))
-		seen := make(set[int64])
+		seen := make(Set[int64])
 		for reps := 2; reps <= repCap; reps++ {
 			start := nextBase(itv.First, reps)
 			end := nextBase(itv.Second+1, reps)
