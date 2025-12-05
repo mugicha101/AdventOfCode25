@@ -8,7 +8,7 @@ func Day1A(io *IO) {
 	var line string
 	pos := 50
 	res := 0
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil {
 		amt, _ := strconv.Atoi(line[1:])
 		amt %= 100
 		if line[0] == 'L' {
@@ -26,7 +26,7 @@ func Day1B(io *IO) {
 	var line string
 	pos := 50
 	res := 0
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil {
 		amt, _ := strconv.Atoi(line[1:])
 
 		// calculate number of zero passes

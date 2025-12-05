@@ -3,7 +3,7 @@ package main
 func solve(io *IO, digs int) {
 	var line string
 	var res int64 = 0
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil {
 		// dp: (index, num vals left) -> max value
 		var dp = make([]int64, digs+1)
 		mv := int64(0)

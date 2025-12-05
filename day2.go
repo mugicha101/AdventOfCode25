@@ -40,7 +40,7 @@ func nextBase(x int64, reps int) int64 {
 
 func Day2A(io *IO) {
 	var line string
-	io.Read(&line)
+	io.Readln(&line)
 	input := strings.Split(line, ",")
 	itvs := make([]Pair[int64, int64], 0, len(input))
 	for _, itv := range input {
@@ -62,7 +62,7 @@ func Day2A(io *IO) {
 
 func Day2B(io *IO) {
 	var line string
-	io.Read(&line)
+	io.Readln(&line)
 	input := strings.Split(line, ",")
 	itvs := make([]Pair[int64, int64], 0, len(input))
 	for _, itv := range input {

@@ -8,7 +8,7 @@ import (
 func fetchIntervals(io *IO) PairList[int64, int64] {
 	var line string
 	itvs := make(PairList[int64, int64], 0)
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil && line != "" {
 		s := strings.Index(line, "-")
 		i, _ := strconv.ParseInt(line[:s], 10, 64)
 		j, _ := strconv.ParseInt(line[s+1:], 10, 64)
@@ -32,7 +32,7 @@ func Day5A(io *IO) {
 	itvs := fetchIntervals(io)
 	var x int64
 	res := 0
-	for io.Read(&x) != nil {
+	for io.Read(&x) == nil {
 		l := 0
 		r := len(itvs) - 1
 		for l != r {

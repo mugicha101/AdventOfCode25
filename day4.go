@@ -20,7 +20,7 @@ func nbs(grid [][]bool, r, c int) int {
 func Day4A(io *IO) {
 	var line string
 	grid := make([][]bool, 0)
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil {
 		grid = append(grid, make([]bool, len(line)))
 		for i, c := range line {
 			grid[len(grid)-1][i] = c == '@'
@@ -42,7 +42,7 @@ func Day4A(io *IO) {
 func Day4B(io *IO) {
 	var line string
 	grid := make([][]bool, 0)
-	for io.Read(&line) != nil {
+	for io.Readln(&line) == nil {
 		grid = append(grid, make([]bool, len(line)))
 		for i, c := range line {
 			grid[len(grid)-1][i] = c == '@'
