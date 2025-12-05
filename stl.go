@@ -135,8 +135,13 @@ type MinPriorityQueue[T Ordered] MinHeap[T]
 func (pq *MinPriorityQueue[T]) Push(x T) {
 	heap.Push((*MinHeap[T])(pq), x)
 }
+
 func (pq *MinPriorityQueue[T]) Pop() T {
 	return heap.Pop((*MinHeap[T])(pq)).(T)
+}
+
+func (pq *MinPriorityQueue[T]) Top() T {
+	return (*pq)[0]
 }
 
 type MaxPriorityQueue[T Ordered] MaxHeap[T]
@@ -144,6 +149,11 @@ type MaxPriorityQueue[T Ordered] MaxHeap[T]
 func (pq *MaxPriorityQueue[T]) Push(x T) {
 	heap.Push((*MaxHeap[T])(pq), x)
 }
+
 func (pq *MaxPriorityQueue[T]) Pop() T {
 	return heap.Pop((*MaxHeap[T])(pq)).(T)
+}
+
+func (pq *MaxPriorityQueue[T]) Top() T {
+	return (*pq)[0]
 }
