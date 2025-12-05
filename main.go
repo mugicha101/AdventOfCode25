@@ -2,7 +2,9 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strings"
@@ -32,32 +34,36 @@ func NewIO(name string) *IO {
 	return &IO{fin: fin, fout: fout, scanner: bufio.NewScanner(fin)}
 }
 
-func (io *IO) Close() {
-	io.scanner = nil
-	io.fin.Close()
-	io.fout.Close()
+func (o *IO) Close() {
+	o.scanner = nil
+	o.fin.Close()
+	o.fout.Close()
 }
 
-func (io *IO) Read(x interface{}) *IO {
+func (o *IO) Read(x interface{}) *IO {
 	start := time.Now()
-	if !io.scanner.Scan() {
+	if !o.scanner.Scan() {
 		x = nil
 		return nil
 	}
-	_, err := fmt.Sscanf(io.scanner.Text(), "%v", x)
+	_, err := fmt.Sscanf(o.scanner.Text(), "%v", x)
+	if errors.Is(err, io.EOF) {
+		x = nil
+		return nil
+	}
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("io.Read error: ", err)
 		os.Exit(-1)
 	}
-	io.ioTime += time.Since(start)
-	return io
+	o.ioTime += time.Since(start)
+	return o
 }
 
-func (io *IO) Write(format string, a ...interface{}) {
+func (o *IO) Write(format string, a ...interface{}) {
 	start := time.Now()
 	fmt.Printf(format, a...)
-	fmt.Fprintf(io.fout, format, a...)
-	io.ioTime += time.Since(start)
+	fmt.Fprintf(o.fout, format, a...)
+	o.ioTime += time.Since(start)
 }
 
 type Call struct {
@@ -73,7 +79,7 @@ func main() {
 	}
 	target := strings.ToLower(args[1])
 	dayMap := map[string][]Call{
-		"all":   {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}, Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}, Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}, Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}},
+		"all":   {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}, Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}, Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}, Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}, Call{f: Day5A, input: "day5"}, Call{f: Day5B, input: "day5"}},
 		"day1":  {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}},
 		"day1a": {Call{f: Day1A, input: "day1"}},
 		"day1b": {Call{f: Day1B, input: "day1"}},
@@ -86,6 +92,9 @@ func main() {
 		"day4":  {Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}},
 		"day4a": {Call{f: Day4A, input: "day4"}},
 		"day4b": {Call{f: Day4B, input: "day4"}},
+		"day5":  {Call{f: Day5A, input: "day5"}, Call{f: Day5B, input: "day5"}},
+		"day5a": {Call{f: Day5A, input: "day5"}},
+		"day5b": {Call{f: Day5B, input: "day5"}},
 	}
 	fs, ok := dayMap[target]
 	if ok {
