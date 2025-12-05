@@ -14,6 +14,8 @@ type Ordered interface {
 	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr | ~float32 | ~float64 | ~string
 }
 
+// hashset without duplicates
+
 type Set[T comparable] map[T]bool
 
 func (s Set[T]) Has(x T) bool {
@@ -37,6 +39,8 @@ func (s Set[T]) Erase(x T) bool {
 	delete(s, x)
 	return true
 }
+
+// hashset with duplicates allowed
 
 type MultiSet[T comparable] map[T]int
 
@@ -71,6 +75,8 @@ func (s MultiSet[T]) Delete(x T) bool {
 	return true
 }
 
+// sortable list of pairs
+
 type PairList[T, U Ordered] []Pair[T, U]
 
 func (p PairList[T, U]) Len() int      { return len(p) }
@@ -81,6 +87,8 @@ func (p PairList[T, U]) Less(i, j int) bool {
 func (p PairList[T, U]) Sort() {
 	sort.Sort(p)
 }
+
+// min heap interface implementation
 
 type MinHeap[T Ordered] []T
 
@@ -106,6 +114,8 @@ func (h *MinHeap[T]) Pop() any {
 	return x
 }
 
+// max heap interface implementation
+
 type MaxHeap[T Ordered] []T
 
 func (h *MaxHeap[T]) Len() int {
@@ -130,6 +140,8 @@ func (h *MaxHeap[T]) Pop() any {
 	return x
 }
 
+// converts min heap interface to methods
+
 type MinPriorityQueue[T Ordered] MinHeap[T]
 
 func (pq *MinPriorityQueue[T]) Push(x T) {
@@ -144,6 +156,8 @@ func (pq *MinPriorityQueue[T]) Top() T {
 	return (*pq)[0]
 }
 
+// converts max heap interface to methods
+
 type MaxPriorityQueue[T Ordered] MaxHeap[T]
 
 func (pq *MaxPriorityQueue[T]) Push(x T) {
@@ -157,3 +171,80 @@ func (pq *MaxPriorityQueue[T]) Pop() T {
 func (pq *MaxPriorityQueue[T]) Top() T {
 	return (*pq)[0]
 }
+
+// double ended queue
+
+type Deque[T any] []T
+
+func (q *Deque[T]) PushBack(x T) {
+	*q = append(*q, x)
+}
+
+func (q *Deque[T]) PopBack() T {
+	x := (*q)[len(*q)-1]
+	*q = (*q)[:len(*q)-1]
+	return x
+}
+
+func (q *Deque[T]) Front() T {
+	return (*q)[0]
+}
+
+func (q *Deque[T]) PushFront(x T) {
+	*q = append([]T{x}, *q...)
+}
+
+func (q *Deque[T]) PopFront() T {
+	x := (*q)[0]
+	*q = (*q)[1:]
+	return x
+}
+
+func (q *Deque[T]) Back() T {
+	return (*q)[len(*q)-1]
+}
+
+// fifo queue
+
+type Queue[T any] Deque[T]
+
+func (q *Queue[T]) Push(x T) {
+	(*Deque[T])(q).PushBack(x)
+}
+
+func (q *Queue[T]) Pop() T {
+	return (*Deque[T])(q).PopFront()
+}
+
+func (q *Queue[T]) Front() T {
+	return (*Deque[T])(q).Front()
+}
+
+func (q *Queue[T]) Back() T {
+	return (*Deque[T])(q).Back()
+}
+
+// lifo stack
+
+type Stack[T any] Deque[T]
+
+func (s *Stack[T]) Push(x T) {
+	(*Deque[T])(s).PushBack(x)
+}
+
+func (s *Stack[T]) Pop() T {
+	return (*Deque[T])(s).PopBack()
+}
+
+func (s *Stack[T]) Top() T {
+	return (*Deque[T])(s).Back()
+}
+
+// ordered set
+// TODO
+
+// ordered multiset
+// TODO
+
+// ordered map
+// TODO
