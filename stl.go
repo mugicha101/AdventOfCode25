@@ -3,11 +3,19 @@ package main
 import (
 	"container/heap"
 	"sort"
+
+	"github.com/tidwall/btree"
 )
 
 type Pair[T, U any] struct {
-	First  T
-	Second U
+	A T
+	B U
+}
+
+type OrderedPair[T Ordered, U Ordered] Pair[T, U]
+
+func (a *OrderedPair[T, U]) Less(b *OrderedPair[T, U]) bool {
+	return a.A < b.A || (a.A == b.A && a.B < b.B)
 }
 
 type Ordered interface {
@@ -77,14 +85,14 @@ func (s MultiSet[T]) Delete(x T) bool {
 
 // sortable list of pairs
 
-type PairList[T, U Ordered] []Pair[T, U]
+type OrderedPairList[T, U Ordered] []OrderedPair[T, U]
 
-func (p PairList[T, U]) Len() int      { return len(p) }
-func (p PairList[T, U]) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
-func (p PairList[T, U]) Less(i, j int) bool {
-	return p[i].First < p[j].First || (p[i].First == p[j].First && p[i].Second < p[j].Second)
+func (p OrderedPairList[T, U]) Len() int      { return len(p) }
+func (p OrderedPairList[T, U]) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p OrderedPairList[T, U]) Less(i, j int) bool {
+	return p[i].Less(&p[j])
 }
-func (p PairList[T, U]) Sort() {
+func (p OrderedPairList[T, U]) Sort() {
 	sort.Sort(p)
 }
 
@@ -240,11 +248,127 @@ func (s *Stack[T]) Top() T {
 	return (*Deque[T])(s).Back()
 }
 
-// ordered set
-// TODO
+// ordered map
+type OrderedMap[K Ordered, V any] btree.Map[K, V]
+
+func NewOrderedMap[K Ordered, V any]() *OrderedMap[K, V] {
+	return (*OrderedMap[K, V])(btree.NewMap[K, V](2))
+}
+
+func (m *OrderedMap[K, V]) Get(key K) V {
+	v, found := (*btree.Map[K, V])(m).Get(key)
+	if !found {
+		var zero V
+		return zero
+	}
+	return v
+}
+
+func (m *OrderedMap[K, V]) Set(key K, value V) {
+	(*btree.Map[K, V])(m).Set(key, value)
+}
+
+func (m *OrderedMap[K, V]) Erase(key K) bool {
+	_, found := (*btree.Map[K, V])(m).Delete(key)
+	return found
+}
+
+func (m *OrderedMap[K, V]) Size() int {
+	return (*btree.Map[K, V])(m).Len()
+}
+
+func (m *OrderedMap[K, V]) HasKey(key K) bool {
+	_, found := (*btree.Map[K, V])(m).Get(key)
+	return found
+}
+
+func (m *OrderedMap[K, V]) MinKey() K {
+	if m.Size() == 0 {
+		panic("MinKey called on empty OrderedMap")
+	}
+	key, _, _ := (*btree.Map[K, V])(m).Min()
+	return key
+}
+
+func (m *OrderedMap[K, V]) MaxKey() K {
+	if m.Size() == 0 {
+		panic("MaxKey called on empty OrderedMap")
+	}
+	key, _, _ := (*btree.Map[K, V])(m).Max()
+	return key
+}
+
+// ordered set using B-tree
+type OrderedSet[T Ordered] OrderedMap[T, struct{}]
+
+func NewOrderedSet[T Ordered]() *OrderedSet[T] {
+	return (*OrderedSet[T])(NewOrderedMap[T, struct{}]())
+}
+
+func (s *OrderedSet[T]) Has(x T) bool {
+	return (*OrderedMap[T, struct{}])(s).HasKey(x)
+}
+
+func (s *OrderedSet[T]) Insert(x T) bool {
+	sizeBefore := s.Size()
+	(*OrderedMap[T, struct{}])(s).Set(x, struct{}{})
+	return s.Size() != sizeBefore
+}
+
+func (s *OrderedSet[T]) Erase(x T) bool {
+	return (*OrderedMap[T, struct{}])(s).Erase(x)
+}
+
+func (s *OrderedSet[T]) Size() int {
+	return (*OrderedMap[T, struct{}])(s).Size()
+}
+
+func (s *OrderedSet[T]) Min() T {
+	return (*OrderedMap[T, struct{}])(s).MinKey()
+}
+
+func (s *OrderedSet[T]) Max() T {
+	return (*OrderedMap[T, struct{}])(s).MaxKey()
+}
 
 // ordered multiset
-// TODO
+type OrderedMultiSet[T Ordered] OrderedMap[T, int]
 
-// ordered map
-// TODO
+func NewOrderedMultiSet[T Ordered]() *OrderedMultiSet[T] {
+	return (*OrderedMultiSet[T])(NewOrderedMap[T, int]())
+}
+
+func (s *OrderedMultiSet[T]) Count(x T) int {
+	return (*OrderedMap[T, int])(s).Get(x)
+}
+
+func (s *OrderedMultiSet[T]) Insert(x T) {
+	(*OrderedMap[T, int])(s).Set(x, s.Count(x)+1)
+}
+
+func (s *OrderedMultiSet[T]) Erase(x T) bool {
+	count := s.Count(x)
+	if count == 0 {
+		return false
+	}
+
+	if count == 1 {
+		(*OrderedMap[T, int])(s).Erase(x)
+	} else {
+		(*OrderedMap[T, int])(s).Set(x, count-1)
+	}
+
+	return true
+}
+
+func (s *OrderedMultiSet[T]) Size() int {
+	return (*OrderedMap[T, int])(s).Size()
+}
+
+func (s *OrderedMultiSet[T]) Min() T {
+	return (*OrderedMap[T, int])(s).MinKey()
+}
+
+func (s *OrderedMultiSet[T]) Max() T {
+	return (*OrderedMap[T, int])(s).MaxKey()
+}

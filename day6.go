@@ -51,17 +51,17 @@ func Day6B(io *IO) {
 	for io.Readln(&line) == nil && !(line[0] == '*' || line[0] == '+' || line[0] == '-') {
 		lines = append(lines, line)
 	}
-	ops := make(PairList[rune, int], 0)
+	ops := make([]Pair[rune, int], 0)
 	for i, c := range line {
 		if c != ' ' {
-			ops = append(ops, Pair[rune, int]{First: c, Second: i})
+			ops = append(ops, Pair[rune, int]{A: c, B: i})
 		}
 	}
-	ops = append(ops, Pair[rune, int]{First: ' ', Second: len(line) + 1})
+	ops = append(ops, Pair[rune, int]{A: ' ', B: len(line) + 1})
 	for i := 0; i < len(ops)-1; i++ {
 		var op func(int64, int64) int64
 		var a int64
-		switch ops[i].First {
+		switch ops[i].A {
 		case '+':
 			a = 0
 			op = func(a, b int64) int64 { return a + b }
@@ -72,9 +72,9 @@ func Day6B(io *IO) {
 			a = 1
 			op = func(a, b int64) int64 { return a * b }
 		default:
-			panic("unknown operator " + string(ops[i].First))
+			panic("unknown operator " + string(ops[i].A))
 		}
-		for c := ops[i+1].Second - 2; c >= ops[i].Second; c-- {
+		for c := ops[i+1].B - 2; c >= ops[i].B; c-- {
 			v := int64(0)
 			for _, row := range lines {
 				if row[c] != ' ' {

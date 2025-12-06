@@ -5,20 +5,20 @@ import (
 	"strings"
 )
 
-func fetchIntervals(io *IO) PairList[int64, int64] {
+func fetchIntervals(io *IO) OrderedPairList[int64, int64] {
 	var line string
-	itvs := make(PairList[int64, int64], 0)
+	itvs := make(OrderedPairList[int64, int64], 0)
 	for io.Readln(&line) == nil && line != "" {
 		s := strings.Index(line, "-")
 		i, _ := strconv.ParseInt(line[:s], 10, 64)
 		j, _ := strconv.ParseInt(line[s+1:], 10, 64)
-		itvs = append(itvs, Pair[int64, int64]{i, j})
+		itvs = append(itvs, OrderedPair[int64, int64]{i, j})
 	}
 	itvs.Sort()
 	j := 0
 	for i := 1; i < len(itvs); i++ {
-		if itvs[j].Second+1 >= itvs[i].First {
-			itvs[j].Second = max(itvs[j].Second, itvs[i].Second)
+		if itvs[j].B+1 >= itvs[i].A {
+			itvs[j].B = max(itvs[j].B, itvs[i].B)
 		} else {
 			j++
 			itvs[j] = itvs[i]
@@ -37,13 +37,13 @@ func Day5A(io *IO) {
 		r := len(itvs) - 1
 		for l != r {
 			m := (l + r + 1) / 2
-			if itvs[m].First <= x {
+			if itvs[m].A <= x {
 				l = m
 			} else {
 				r = m - 1
 			}
 		}
-		if itvs[l].First <= x && itvs[l].Second >= x {
+		if itvs[l].A <= x && itvs[l].B >= x {
 			res++
 		}
 	}
@@ -55,7 +55,7 @@ func Day5B(io *IO) {
 	itvs := fetchIntervals(io)
 	res := int64(0)
 	for _, itv := range itvs {
-		res += itv.Second - itv.First + 1
+		res += itv.B - itv.A + 1
 	}
 	io.Write("%d\n", res)
 }

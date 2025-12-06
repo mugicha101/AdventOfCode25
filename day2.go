@@ -47,12 +47,12 @@ func Day2A(io *IO) {
 		segs := strings.Split(itv, "-")
 		lo, _ := strconv.ParseInt(segs[0], 10, 64)
 		hi, _ := strconv.ParseInt(segs[1], 10, 64)
-		itvs = append(itvs, Pair[int64, int64]{First: lo, Second: hi})
+		itvs = append(itvs, Pair[int64, int64]{A: lo, B: hi})
 	}
 	var res int64 = 0
 	for _, itv := range itvs {
-		start := nextBase(itv.First, 2)
-		end := nextBase(itv.Second+1, 2)
+		start := nextBase(itv.A, 2)
+		end := nextBase(itv.B+1, 2)
 		for half := start; half < end; half++ {
 			res += rep(half, 2)
 		}
@@ -69,15 +69,15 @@ func Day2B(io *IO) {
 		segs := strings.Split(itv, "-")
 		lo, _ := strconv.ParseInt(segs[0], 10, 64)
 		hi, _ := strconv.ParseInt(segs[1], 10, 64)
-		itvs = append(itvs, Pair[int64, int64]{First: lo, Second: hi})
+		itvs = append(itvs, Pair[int64, int64]{A: lo, B: hi})
 	}
 	var res int64 = 0
 	for _, itv := range itvs {
-		repCap := int(math.Ceil(math.Log10(float64(itv.Second))))
+		repCap := int(math.Ceil(math.Log10(float64(itv.B))))
 		seen := make(Set[int64])
 		for reps := 2; reps <= repCap; reps++ {
-			start := nextBase(itv.First, reps)
-			end := nextBase(itv.Second+1, reps)
+			start := nextBase(itv.A, reps)
+			end := nextBase(itv.B+1, reps)
 			for half := start; half < end; half++ {
 				val := rep(half, reps)
 				if seen.Insert(val) {
