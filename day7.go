@@ -37,9 +37,9 @@ func Day7B(io *IO) {
 			}
 		}
 	}
-	res := 0
+	res := int64(0)
 	for _, v := range dp {
-		res += int(v)
+		res += v
 	}
 	io.Write("%d\n", res)
 }
