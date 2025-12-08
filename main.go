@@ -3,11 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
 
 type Call struct {
+	name  string
 	f     func(*IO)
 	input string
 }
@@ -19,47 +21,63 @@ func main() {
 		return
 	}
 	target := strings.ToLower(args[1])
-	dayMap := map[string][]Call{
-		"all":   {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}, Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}, Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}, Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}, Call{f: Day5A, input: "day5"}, Call{f: Day5B, input: "day5"}, Call{f: Day6A, input: "day6"}, Call{f: Day6B, input: "day6"}, Call{f: Day7A, input: "day7"}, Call{f: Day7B, input: "day7"}},
-		"day1":  {Call{f: Day1A, input: "day1"}, Call{f: Day1B, input: "day1"}},
-		"day1a": {Call{f: Day1A, input: "day1"}},
-		"day1b": {Call{f: Day1B, input: "day1"}},
-		"day2":  {Call{f: Day2A, input: "day2"}, Call{f: Day2B, input: "day2"}},
-		"day2a": {Call{f: Day2A, input: "day2"}},
-		"day2b": {Call{f: Day2B, input: "day2"}},
-		"day3":  {Call{f: Day3A, input: "day3"}, Call{f: Day3B, input: "day3"}},
-		"day3a": {Call{f: Day3A, input: "day3"}},
-		"day3b": {Call{f: Day3B, input: "day3"}},
-		"day4":  {Call{f: Day4A, input: "day4"}, Call{f: Day4B, input: "day4"}},
-		"day4a": {Call{f: Day4A, input: "day4"}},
-		"day4b": {Call{f: Day4B, input: "day4"}},
-		"day5":  {Call{f: Day5A, input: "day5"}, Call{f: Day5B, input: "day5"}},
-		"day5a": {Call{f: Day5A, input: "day5"}},
-		"day5b": {Call{f: Day5B, input: "day5"}},
-		"day6":  {Call{f: Day6A, input: "day6"}, Call{f: Day6B, input: "day6"}},
-		"day6a": {Call{f: Day6A, input: "day6"}},
-		"day6b": {Call{f: Day6B, input: "day6"}},
-		"day7":  {Call{f: Day7A, input: "day7"}, Call{f: Day7B, input: "day7"}},
-		"day7a": {Call{f: Day7A, input: "day7"}},
-		"day7b": {Call{f: Day7B, input: "day7"}},
+	calls := [][]Call{
+		{Call{name: "day1a", f: Day1A, input: "day1"}, Call{name: "day1b", f: Day1B, input: "day1"}},
+		{Call{name: "day2a", f: Day2A, input: "day2"}, Call{name: "day2b", f: Day2B, input: "day2"}},
+		{Call{name: "day3a", f: Day3A, input: "day3"}, Call{name: "day3b", f: Day3B, input: "day3"}},
+		{Call{name: "day4a", f: Day4A, input: "day4"}, Call{name: "day4b", f: Day4B, input: "day4"}},
+		{Call{name: "day5a", f: Day5A, input: "day5"}, Call{name: "day5b", f: Day5B, input: "day5"}},
+		{Call{name: "day6a", f: Day6A, input: "day6"}, Call{name: "day6b", f: Day6B, input: "day6"}},
+		{Call{name: "day7a", f: Day7A, input: "day7"}, Call{name: "day7b", f: Day7B, input: "day7"}},
+		{Call{name: "day8a", f: Day8A, input: "day8"}, Call{name: "day8b", f: Day8B, input: "day8"}},
 	}
-	fs, ok := dayMap[target]
-	if ok {
-		var totalTimeExec time.Duration
-		var totalTimeIo time.Duration
-		for _, c := range fs {
-			io := NewIO(c.input)
-			start := time.Now()
-			c.f(io)
-			elapsed := time.Since(start)
-			elapsed -= io.ioTime
-			io.Close()
-			fmt.Printf("      Time: %v exec\n            %v io\n", elapsed, io.ioTime)
-			totalTimeExec += elapsed
-			totalTimeIo += io.ioTime
+	targetCalls := make([]Call, 0)
+	if target == "all" {
+		for _, dayCalls := range calls {
+			for _, c := range dayCalls {
+				targetCalls = append(targetCalls, c)
+			}
 		}
-		fmt.Printf("Total Time: %v exec\n            %v io\n", totalTimeExec, totalTimeIo)
-	} else {
-		fmt.Printf("Target %s not found\n", target)
+	} else if strings.HasPrefix(target, "day") && len(target) >= 4 {
+		last := len(target)
+		includeA := true
+		includeB := true
+		if target[len(target)-1] == 'a' {
+			last--
+			includeB = false
+		} else if target[len(target)-1] == 'b' {
+			last--
+			includeA = false
+		}
+		if last > 3 {
+			dayNum, ok := strconv.Atoi(target[3:last])
+			if ok == nil && dayNum >= 1 && dayNum <= len(calls) {
+				if includeA {
+					targetCalls = append(targetCalls, calls[dayNum-1][0])
+				}
+				if includeB {
+					targetCalls = append(targetCalls, calls[dayNum-1][1])
+				}
+			}
+		}
 	}
+	if len(targetCalls) == 0 {
+		fmt.Printf("Target %s not found\n", target)
+		return
+	}
+
+	var totalTimeExec time.Duration
+	var totalTimeIo time.Duration
+	for _, c := range targetCalls {
+		io := NewIO(c.input)
+		start := time.Now()
+		c.f(io)
+		elapsed := time.Since(start)
+		elapsed -= io.ioTime
+		io.Close()
+		fmt.Printf("      Time: %v exec\n            %v io\n", elapsed, io.ioTime)
+		totalTimeExec += elapsed
+		totalTimeIo += io.ioTime
+	}
+	fmt.Printf("Total Time: %v exec\n            %v io\n", totalTimeExec, totalTimeIo)
 }
