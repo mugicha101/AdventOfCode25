@@ -69,6 +69,7 @@ func main() {
 	var totalTimeExec time.Duration
 	var totalTimeIo time.Duration
 	for _, c := range targetCalls {
+		fmt.Printf("%s:\n", c.name)
 		io := NewIO(c.input)
 		start := time.Now()
 		c.f(io)
