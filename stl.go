@@ -3,6 +3,7 @@ package main
 import (
 	"container/heap"
 	"sort"
+	"strconv"
 
 	"github.com/tidwall/btree"
 )
@@ -371,4 +372,87 @@ func (s *OrderedMultiSet[T]) Min() T {
 
 func (s *OrderedMultiSet[T]) Max() T {
 	return (*OrderedMap[T, int])(s).MaxKey()
+}
+
+// general utility functions
+
+func stoi(s string) int {
+	res, ok := strconv.Atoi(s)
+	if ok != nil {
+		panic(ok)
+	}
+	return res
+}
+
+func stoll(s string) int64 {
+	res, ok := strconv.ParseInt(s, 10, 64)
+	if ok != nil {
+		panic(ok)
+	}
+	return int64(res)
+}
+
+type Numeric interface {
+	~int | ~float64 | ~int64 | ~int32 | ~int16 | ~int8 | ~uint | ~uint64 | ~uint32 | ~uint16 | ~uint8 | ~uintptr | ~float32
+}
+
+func abs[T Numeric](x T) T {
+	if x < 0 {
+		return -x
+	} else {
+		return x
+	}
+}
+
+// union find
+
+type UnionFind struct {
+	uf    []int
+	size  []int
+	comps int
+}
+
+func NewUnionFind(n int) *UnionFind {
+	uf := make([]int, n)
+	size := make([]int, n)
+	for i := 0; i < n; i++ {
+		uf[i] = i
+		size[i] = 1
+	}
+	return &UnionFind{uf: uf, size: size, comps: n}
+}
+
+func (uf *UnionFind) Find(x int) int {
+	if uf.uf[x] != x {
+		uf.uf[x] = uf.Find(uf.uf[x])
+	}
+	return uf.uf[x]
+}
+
+func (uf *UnionFind) Merge(a, b int) bool {
+	ra := uf.Find(a)
+	rb := uf.Find(b)
+	if ra == rb {
+		return false
+	}
+	if uf.size[ra] < uf.size[rb] {
+		ra, rb = rb, ra
+	}
+	uf.uf[rb] = ra
+	uf.size[ra] += uf.size[rb]
+	uf.size[rb] = 0
+	uf.comps--
+	return true
+}
+
+func (uf *UnionFind) CompSize(x int) int {
+	return uf.size[uf.Find(x)]
+}
+
+func (uf *UnionFind) NumComps() int {
+	return uf.comps
+}
+
+func (uf *UnionFind) Len() int {
+	return len(uf.uf)
 }
