@@ -456,3 +456,82 @@ func (uf *UnionFind) NumComps() int {
 func (uf *UnionFind) Len() int {
 	return len(uf.uf)
 }
+
+// sorting algorithms
+
+// insertion sort based on second value of pair
+func ISort[T any](arr []Pair[T, int64]) []Pair[T, int64] {
+	for i := 1; i < len(arr); i++ {
+		for j := i; j > 0 && arr[j-1].B > arr[j].B; j-- {
+			arr[j-1], arr[j] = arr[j], arr[j-1]
+		}
+	}
+	return arr
+}
+
+// quicksort based on second value of pair
+func QSort[T any](arr []Pair[T, int64]) []Pair[T, int64] {
+	if len(arr) < 5 {
+		return ISort(arr)
+	}
+
+	// choose pivot
+	mid := (len(arr)) >> 1
+	if arr[0].B > arr[mid].B {
+		arr[0], arr[mid] = arr[mid], arr[0]
+	}
+	if arr[mid].B > arr[len(arr)-1].B {
+		arr[mid], arr[len(arr)-1] = arr[len(arr)-1], arr[mid]
+	}
+	if arr[0].B > arr[mid].B {
+		arr[0], arr[mid] = arr[mid], arr[0]
+	}
+
+	arr[mid], arr[len(arr)-1] = arr[len(arr)-1], arr[mid]
+	l := 0
+	for i := 0; i < len(arr)-1; i++ {
+		if arr[i].B < arr[len(arr)-1].B {
+			arr[i], arr[l] = arr[l], arr[i]
+			l++
+		}
+	}
+	arr[l], arr[len(arr)-1] = arr[len(arr)-1], arr[l]
+	QSort(arr[:l])
+	QSort(arr[l+1:])
+	return arr
+}
+
+// base 2^bits radix sort based on second value of pair
+func RSort[T any](arr []Pair[T, int64], bits int) []Pair[T, int64] {
+	p := int64(1) << bits
+	buckets := make([][]Pair[T, int64], p)
+	next := make([]int, p)
+	for i := 0; i < int(p); i++ {
+		buckets[i] = make([]Pair[T, int64], len(arr))
+	}
+	maxBits := 0
+	for i := 0; i < len(arr); i++ {
+		for arr[i].B > (int64(1) << maxBits) {
+			maxBits++
+		}
+	}
+	maxBits += (maxBits & 1)
+	for shift := 0; shift < maxBits; shift += 2 {
+		for i := 0; i < len(arr); i++ {
+			bit := (arr[i].B >> shift) & (p - 1)
+			buckets[bit][next[bit]] = arr[i]
+			next[bit]++
+		}
+		k := 0
+		for i := 0; i < int(p); i++ {
+			for j := 0; j < next[i]; j++ {
+				arr[k] = buckets[i][j]
+				k++
+			}
+		}
+		for i := 0; i < int(p); i++ {
+			next[i] = 0
+		}
+	}
+	return arr
+}

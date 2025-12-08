@@ -1,30 +1,38 @@
 package main
 
 import (
-	"sort"
 	"strings"
 )
 
-func day8input(io *IO) ([][3]int64, [][3]int64) {
+func day8input(io *IO) ([][3]int64, [][2]int) {
 	var line string
 	pts := make([][3]int64, 0)
 	for io.Readln(&line) == nil {
 		segs := strings.Split(line, ",")
 		pts = append(pts, [3]int64{stoll(segs[0]), stoll(segs[1]), stoll(segs[2])})
 	}
-	pairs := make([][3]int64, 0, len(pts)*(len(pts)-1)/2)
+	pairs := make([][2]int, len(pts)*(len(pts)-1)/2)
+	k := 0
 	for i := 0; i < len(pts); i++ {
 		for j := i + 1; j < len(pts); j++ {
-			dx := abs(pts[i][0] - pts[j][0])
-			dy := abs(pts[i][1] - pts[j][1])
-			dz := abs(pts[i][2] - pts[j][2])
-			pairs = append(pairs, [3]int64{int64(i), int64(j), dx*dx + dy*dy + dz*dz})
+			pairs[k] = [2]int{i, j}
+			k++
 		}
 	}
-	sort.Slice(pairs, func(i, j int) bool {
-		return pairs[i][2] < pairs[j][2]
-	})
-	return pts, pairs
+	order := make([]Pair[int, int64], len(pairs))
+	for i := 0; i < len(pairs); i++ {
+		dx := pts[pairs[i][0]][0] - pts[pairs[i][1]][0]
+		dy := pts[pairs[i][0]][1] - pts[pairs[i][1]][1]
+		dz := pts[pairs[i][0]][2] - pts[pairs[i][1]][2]
+		order[i] = Pair[int, int64]{i, dx*dx + dy*dy + dz*dz}
+	}
+	order = QSort(order)
+	sortedPairs := make([][2]int, len(pairs))
+	for i := 0; i < len(order); i++ {
+		sortedPairs[i] = pairs[order[i].A]
+	}
+
+	return pts, sortedPairs
 }
 
 func Day8A(io *IO) {
