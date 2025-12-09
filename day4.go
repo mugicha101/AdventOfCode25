@@ -1,6 +1,6 @@
 package main
 
-func nbs(grid [][]bool, r, c int) int {
+func day4nbs(grid [][]bool, r, c int) int {
 	rows := len(grid)
 	cols := len(grid[0])
 	nbs := 0
@@ -31,7 +31,7 @@ func Day4A(io *IO) {
 	res := 0
 	for r := 0; r < rows; r++ {
 		for c := 0; c < cols; c++ {
-			if grid[r][c] && nbs(grid, r, c) < 4 {
+			if grid[r][c] && day4nbs(grid, r, c) < 4 {
 				res++
 			}
 		}
@@ -53,7 +53,7 @@ func Day4B(io *IO) {
 	q := make([][2]int, 0)
 	for r := 0; r < rows; r++ {
 		for c := 0; c < cols; c++ {
-			if grid[r][c] && nbs(grid, r, c) < 4 {
+			if grid[r][c] && day4nbs(grid, r, c) < 4 {
 				grid[r][c] = false
 				q = append(q, [2]int{r, c})
 			}
@@ -67,7 +67,7 @@ func Day4B(io *IO) {
 		q = q[1:]
 		for nr := max(0, r-1); nr <= min(rows-1, r+1); nr++ {
 			for nc := max(0, c-1); nc <= min(cols-1, c+1); nc++ {
-				if grid[nr][nc] && nbs(grid, nr, nc) < 4 {
+				if grid[nr][nc] && day4nbs(grid, nr, nc) < 4 {
 					grid[nr][nc] = false
 					q = append(q, [2]int{nr, nc})
 				}

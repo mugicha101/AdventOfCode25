@@ -1,6 +1,6 @@
 package main
 
-func solve(io *IO, digs int) {
+func day3solve(io *IO, digs int) {
 	var line string
 	var res int64 = 0
 	for io.Readln(&line) == nil {
@@ -20,9 +20,9 @@ func solve(io *IO, digs int) {
 }
 
 func Day3A(io *IO) {
-	solve(io, 2)
+	day3solve(io, 2)
 }
 
 func Day3B(io *IO) {
-	solve(io, 12)
+	day3solve(io, 12)
 }

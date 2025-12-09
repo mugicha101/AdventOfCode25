@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func fetchIntervals(io *IO) OrderedPairList[int64, int64] {
+func day5fetchIntervals(io *IO) OrderedPairList[int64, int64] {
 	var line string
 	itvs := make(OrderedPairList[int64, int64], 0)
 	for io.Readln(&line) == nil && line != "" {
@@ -29,7 +29,7 @@ func fetchIntervals(io *IO) OrderedPairList[int64, int64] {
 }
 
 func Day5A(io *IO) {
-	itvs := fetchIntervals(io)
+	itvs := day5fetchIntervals(io)
 	var x int64
 	res := 0
 	for io.Read(&x) == nil {
@@ -52,7 +52,7 @@ func Day5A(io *IO) {
 }
 
 func Day5B(io *IO) {
-	itvs := fetchIntervals(io)
+	itvs := day5fetchIntervals(io)
 	res := int64(0)
 	for _, itv := range itvs {
 		res += itv.B - itv.A + 1

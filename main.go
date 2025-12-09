@@ -35,9 +35,7 @@ func main() {
 	targetCalls := make([]Call, 0)
 	if target == "all" {
 		for _, dayCalls := range calls {
-			for _, c := range dayCalls {
-				targetCalls = append(targetCalls, c)
-			}
+			targetCalls = append(targetCalls, dayCalls...)
 		}
 	} else if strings.HasPrefix(target, "day") && len(target) >= 4 {
 		last := len(target)

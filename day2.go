@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func rep(x int64, reps int) int64 {
+func day2rep(x int64, reps int) int64 {
 	var mag int64 = 10
 	for mag <= x {
 		mag *= 10
@@ -20,16 +20,16 @@ func rep(x int64, reps int) int64 {
 	return res
 }
 
-func nextBase(x int64, reps int) int64 {
+func day2nextBase(x int64, reps int) int64 {
 	var lo int64 = 1
 	var hi int64 = 1
-	for rep(hi, reps) < x {
+	for day2rep(hi, reps) < x {
 		lo = hi
 		hi *= 2
 	}
 	for lo < hi {
 		m := (lo + hi) >> 1
-		if rep(m, reps) >= x {
+		if day2rep(m, reps) >= x {
 			hi = m
 		} else {
 			lo = m + 1
@@ -51,10 +51,10 @@ func Day2A(io *IO) {
 	}
 	var res int64 = 0
 	for _, itv := range itvs {
-		start := nextBase(itv.A, 2)
-		end := nextBase(itv.B+1, 2)
+		start := day2nextBase(itv.A, 2)
+		end := day2nextBase(itv.B+1, 2)
 		for half := start; half < end; half++ {
-			res += rep(half, 2)
+			res += day2rep(half, 2)
 		}
 	}
 	io.Write("%d\n", res)
@@ -76,10 +76,10 @@ func Day2B(io *IO) {
 		repCap := int(math.Ceil(math.Log10(float64(itv.B))))
 		seen := make(Set[int64])
 		for reps := 2; reps <= repCap; reps++ {
-			start := nextBase(itv.A, reps)
-			end := nextBase(itv.B+1, reps)
+			start := day2nextBase(itv.A, reps)
+			end := day2nextBase(itv.B+1, reps)
 			for half := start; half < end; half++ {
-				val := rep(half, reps)
+				val := day2rep(half, reps)
 				if seen.Insert(val) {
 					res += val
 				}
