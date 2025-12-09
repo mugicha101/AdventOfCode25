@@ -128,21 +128,27 @@ func Day8A(io *IO) {
 		a, b := int(pairs[i][0]), int(pairs[i][1])
 		uf.Merge(a, b)
 	}
-	top := make(MinPriorityQueue[int], 0)
+	top := [3]int{1, 1, 1}
 	for i := 0; i < uf.Len(); i++ {
 		if uf.Find(i) != i {
 			continue
 		}
 		sz := uf.CompSize(i)
-		top.Push(sz)
-		if len(top) > 3 {
-			top.Pop()
+		if sz > top[0] {
+			if sz > top[1] {
+				top[0] = top[1]
+				if sz > top[2] {
+					top[1] = top[2]
+					top[2] = sz
+				} else {
+					top[1] = sz
+				}
+			} else {
+				top[0] = sz
+			}
 		}
 	}
-	res := 1
-	for _, x := range top {
-		res *= x
-	}
+	res := top[0] * top[1] * top[2]
 	io.Write("%d\n", res)
 }
 
