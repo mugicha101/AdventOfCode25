@@ -37,13 +37,17 @@ func day8input(io *IO) ([][3]int64, int64) {
 func pairsWithinDist(pts [][3]int64, k, d int64) [][2]int {
 	n := int((k + d - 1) / d) // diameter in chunks
 	grid := Mat3D[[]int](n, n, n)
+	maxChunk := 0
 	for i, p := range pts {
 		x := p[0] / d
 		y := p[1] / d
 		z := p[2] / d
 		grid[x][y][z] = append(grid[x][y][z], i)
+		if len(grid[x][y][z]) > maxChunk {
+			maxChunk++
+		}
 	}
-	pairs := make([][2]int, 0)
+	pairs := make([][2]int, 0, maxChunk*maxChunk*9)
 	for x := 0; x < n; x++ {
 		for y := 0; y < n; y++ {
 			for z := 0; z < n; z++ {
