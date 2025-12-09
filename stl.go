@@ -458,11 +458,23 @@ func (uf *UnionFind) Len() int {
 }
 
 // sorting algorithms
+// note: modifies input array but also returns it just in case
 
 // insertion sort based on second value of pair
 func ISort[T any](arr []Pair[T, int64]) []Pair[T, int64] {
 	for i := 1; i < len(arr); i++ {
 		for j := i; j > 0 && arr[j-1].B > arr[j].B; j-- {
+			arr[j-1], arr[j] = arr[j], arr[j-1]
+		}
+	}
+	return arr
+}
+
+// insertion sort directly on values
+
+func ISortT[T Ordered](arr []T) []T {
+	for i := 1; i < len(arr); i++ {
+		for j := i; j > 0 && arr[j-1] > arr[j]; j-- {
 			arr[j-1], arr[j] = arr[j], arr[j-1]
 		}
 	}
@@ -501,6 +513,39 @@ func QSort[T any](arr []Pair[T, int64]) []Pair[T, int64] {
 	return arr
 }
 
+// quicksort directly on values
+
+func QSortT[T Ordered](arr []T) []T {
+	if len(arr) < 5 {
+		return ISortT(arr)
+	}
+
+	// choose pivot
+	mid := (len(arr)) >> 1
+	if arr[0] > arr[mid] {
+		arr[0], arr[mid] = arr[mid], arr[0]
+	}
+	if arr[mid] > arr[len(arr)-1] {
+		arr[mid], arr[len(arr)-1] = arr[len(arr)-1], arr[mid]
+	}
+	if arr[0] > arr[mid] {
+		arr[0], arr[mid] = arr[mid], arr[0]
+	}
+
+	arr[mid], arr[len(arr)-1] = arr[len(arr)-1], arr[mid]
+	l := 0
+	for i := 0; i < len(arr)-1; i++ {
+		if arr[i] < arr[len(arr)-1] {
+			arr[i], arr[l] = arr[l], arr[i]
+			l++
+		}
+	}
+	arr[l], arr[len(arr)-1] = arr[len(arr)-1], arr[l]
+	QSortT(arr[:l])
+	QSortT(arr[l+1:])
+	return arr
+}
+
 // base 2^bits radix sort based on second value of pair
 func RSort[T any](arr []Pair[T, int64], bits int) []Pair[T, int64] {
 	p := int64(1) << bits
@@ -532,6 +577,50 @@ func RSort[T any](arr []Pair[T, int64], bits int) []Pair[T, int64] {
 		for i := 0; i < int(p); i++ {
 			next[i] = 0
 		}
+	}
+	return arr
+}
+
+// coordinate compression helpers
+
+// remove all duplicates from slice (must be grouped by equal values, shifts all duplicates to end and resizes slice to cut them off)
+func Unique[T comparable](arr []T) []T {
+	j := 0
+	for i := 1; i < len(arr); i++ {
+		if arr[j] != arr[i] {
+			j++
+			arr[j] = arr[i]
+		}
+	}
+	return arr[:j+1]
+}
+
+// maps values in arr to their rank and returns sorted unique values + mapping from value to rank
+func RankMap[T Ordered](arr []T) ([]T, map[T]int) {
+	QSortT(arr)
+	arr = Unique(arr)
+	rank := map[T]int{}
+	for i, v := range arr {
+		rank[v] = i
+	}
+	return arr, rank
+}
+
+// init matrices
+func Arr[T any](size int) []T {
+	return make([]T, size)
+}
+func Mat[T any](rows int, cols int) [][]T {
+	arr := make([][]T, rows)
+	for i := 0; i < rows; i++ {
+		arr[i] = make([]T, cols)
+	}
+	return arr
+}
+func Mat3D[T any](x, y, z int) [][][]T {
+	arr := make([][][]T, x)
+	for i := 0; i < x; i++ {
+		arr[i] = Mat[T](y, z)
 	}
 	return arr
 }
