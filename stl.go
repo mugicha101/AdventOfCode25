@@ -396,6 +396,10 @@ type Numeric interface {
 	~int | ~float64 | ~int64 | ~int32 | ~int16 | ~int8 | ~uint | ~uint64 | ~uint32 | ~uint16 | ~uint8 | ~uintptr | ~float32
 }
 
+type Integral interface {
+	~int | ~int64 | ~int32 | ~int16 | ~int8 | ~uint | ~uint64 | ~uint32 | ~uint16 | ~uint8 | ~uintptr
+}
+
 func abs[T Numeric](x T) T {
 	if x < 0 {
 		return -x
@@ -610,16 +614,16 @@ func RankMap[T Ordered](arr []T) ([]T, map[T]int) {
 func Arr[T any](size int) []T {
 	return make([]T, size)
 }
-func Mat[T any](rows int, cols int) [][]T {
+func Mat[T any, N Integral](rows N, cols N) [][]T {
 	arr := make([][]T, rows)
-	for i := 0; i < rows; i++ {
+	for i := N(0); i < rows; i++ {
 		arr[i] = make([]T, cols)
 	}
 	return arr
 }
-func Mat3D[T any](x, y, z int) [][][]T {
+func Mat3D[T any, N Integral](x, y, z N) [][][]T {
 	arr := make([][][]T, x)
-	for i := 0; i < x; i++ {
+	for i := N(0); i < x; i++ {
 		arr[i] = Mat[T](y, z)
 	}
 	return arr
