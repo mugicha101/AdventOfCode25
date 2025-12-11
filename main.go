@@ -32,6 +32,7 @@ func main() {
 		{Call{name: "day8a", f: Day8A, input: "day8"}, Call{name: "day8b", f: Day8B, input: "day8"}},
 		{Call{name: "day9a", f: Day9A, input: "day9"}, Call{name: "day9b", f: Day9B, input: "day9"}},
 		{Call{name: "day10a", f: Day10A, input: "day10"}, Call{name: "day10b", f: Day10B, input: "day10"}},
+		{Call{name: "day11a", f: Day11A, input: "day11"}, Call{name: "day11b", f: Day11B, input: "day11"}},
 	}
 	targetCalls := make([]Call, 0)
 	if target == "all" {
