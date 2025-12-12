@@ -2,11 +2,7 @@ package main
 
 import (
 	"math"
-	"strconv"
 	"strings"
-
-	"github.com/chriso345/gspl/lp"
-	"github.com/chriso345/gspl/solver"
 )
 
 type machine struct {
@@ -75,44 +71,92 @@ func Day10A(io *IO) {
 	io.Write("%d\n", res)
 }
 
+func day10bdfs(patMap map[uint64][]uint64, m *machine, io *IO) int {
+	// find all ways to make odd joltages even
+	// once thats applied, all future button presses need to be even
+	// thus divide joltage by 2 and recurse to find the number of presses / 2
+
+	// all joltage 0
+	totalJoltage := 0
+	for _, j := range m.joltage {
+		totalJoltage += j
+	}
+	if totalJoltage == 0 {
+		return 0
+	}
+
+	// figure out target light pattern from joltage parity
+	target := 0
+	for i, j := range m.joltage {
+		target |= (j & 1) << i
+	}
+
+	// try all subsets that achieve target pattern
+	minPresses := math.MaxInt32
+	for _, subset := range patMap[uint64(target)] {
+		// figure out subsets effect on joltage
+		presses := 0
+		djoltage := make([]int, len(m.joltage))
+		for i := 0; i < len(m.buttons); i++ {
+			if (subset>>i)&1 == 0 {
+				continue
+			}
+			presses++
+			for j := 0; j < len(m.joltage); j++ {
+				djoltage[j] += int((m.buttons[i] >> j) & 1)
+			}
+		}
+
+		// check that joltages all non-negative
+		valid := true
+		for j := 0; valid && j < len(m.joltage); j++ {
+			if djoltage[j] > m.joltage[j] {
+				valid = false
+			}
+		}
+		if !valid {
+			continue
+		}
+
+		// apply joltage change and recurse
+		for j := 0; j < len(m.joltage); j++ {
+			m.joltage[j] = (m.joltage[j] - djoltage[j]) >> 1
+		}
+		recPresses := day10bdfs(patMap, m, io)
+		if recPresses != math.MaxInt32 {
+			minPresses = min(minPresses, presses+recPresses*2)
+		}
+		for j := 0; j < len(m.joltage); j++ {
+			m.joltage[j] = (m.joltage[j] << 1) + djoltage[j]
+		}
+	}
+	return minPresses
+}
+
 func Day10B(io *IO) {
 	machines := day10input(io)
 	res := 0
+	// elegant solution from https://www.reddit.com/r/adventofcode/comments/1pk87hl/2025_day_10_part_2_bifurcate_your_way_to_victory/
+	// avoids integer linear programming and gauss elimination
 	for _, m := range machines {
-		// reduces to a linear equation
-		// x_i = presses of button i
-		// b_i = counter i
-		// a_ij = 1 if button j increments counter i
-		// minimize sum x_i
-		// s.t. for all i: sum_j a_ij * x_j = b_i
-		// TODO: replace with z3, this library may have bugs
-		x := make([]lp.LpVariable, len(m.buttons))
-		objTerms := make([]lp.LpTerm, len(m.buttons))
-		for i := range m.buttons {
-			x[i] = lp.NewVariable("x"+strconv.Itoa(i), lp.LpCategoryContinuous)
-			objTerms[i] = lp.NewTerm(1, x[i])
-		}
-		obj := lp.NewExpression(objTerms)
-		prog := lp.NewLinearProgram("ILP", x)
-		prog.AddObjective(lp.LpMinimise, obj)
-		io.Write("%d %d\n", len(m.buttons), len(m.joltage))
-		for i, jreq := range m.joltage {
-			conTerms := make([]lp.LpTerm, 0)
-			for j, bl := range m.buttons {
-				if (bl>>i)&1 == 0 {
-					continue
+		// map every lighting pattern to subsets of buttons satisfying it
+		patMap := make(map[uint64][]uint64)
+		for subset := uint64(0); subset < 1<<len(m.buttons); subset++ {
+			presses := 0
+			pattern := uint64(0)
+			for i := 0; i < len(m.buttons); i++ {
+				if (subset>>i)&1 == 1 {
+					pattern ^= m.buttons[i]
+					presses++
 				}
-				// button j increases counter i
-				conTerms = append(conTerms, lp.NewTerm(1, x[j]))
 			}
-			prog.AddConstraint(lp.NewExpression(conTerms), lp.LpConstraintEQ, float64(jreq))
+			if patMap[pattern] == nil {
+				patMap[pattern] = make([]uint64, 0)
+			}
+			patMap[pattern] = append(patMap[pattern], subset)
 		}
-		solver.Solve(&prog)
-		// prog.PrintSolution()
-		io.Write("%v\n", prog.Solution)
-		if prog.Status == lp.LpStatusOptimal {
-			res -= int(math.Floor(prog.Solution))
-		}
+
+		res += day10bdfs(patMap, &m, io)
 	}
 	io.Write("%d\n", res)
 }
