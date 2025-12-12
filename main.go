@@ -42,6 +42,14 @@ func main() {
 		}
 	} else if target == "day12" {
 		targetCalls = append(targetCalls, calls[11][0])
+	} else if target == "no10b" {
+		for _, dayCalls := range calls {
+			for _, call := range dayCalls {
+				if call.name != "day10b" {
+					targetCalls = append(targetCalls, call)
+				}
+			}
+		}
 	} else if strings.HasPrefix(target, "day") && len(target) >= 4 {
 		last := len(target)
 		includeA := true
