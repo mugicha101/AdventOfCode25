@@ -1,4 +1,4 @@
-Advent of Code 2026 in Golang
+Advent of Code 2025 in Golang
 
 to add inputs: `input/day1.txt`
 to run all: `go run . all`
