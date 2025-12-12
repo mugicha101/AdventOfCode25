@@ -33,12 +33,15 @@ func main() {
 		{Call{name: "day9a", f: Day9A, input: "day9"}, Call{name: "day9b", f: Day9B, input: "day9"}},
 		{Call{name: "day10a", f: Day10A, input: "day10"}, Call{name: "day10b", f: Day10B, input: "day10"}},
 		{Call{name: "day11a", f: Day11A, input: "day11"}, Call{name: "day11b", f: Day11B, input: "day11"}},
+		{Call{name: "day12", f: Day12, input: "day12"}},
 	}
 	targetCalls := make([]Call, 0)
 	if target == "all" {
 		for _, dayCalls := range calls {
 			targetCalls = append(targetCalls, dayCalls...)
 		}
+	} else if target == "day12" {
+		targetCalls = append(targetCalls, calls[11][0])
 	} else if strings.HasPrefix(target, "day") && len(target) >= 4 {
 		last := len(target)
 		includeA := true
@@ -52,7 +55,7 @@ func main() {
 		}
 		if last > 3 {
 			dayNum, ok := strconv.Atoi(target[3:last])
-			if ok == nil && dayNum >= 1 && dayNum <= len(calls) {
+			if ok == nil && dayNum >= 1 && dayNum <= len(calls)-1 {
 				if includeA {
 					targetCalls = append(targetCalls, calls[dayNum-1][0])
 				}
