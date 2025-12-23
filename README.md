@@ -25,3 +25,5 @@ to run all without 10b: `go run no10b`
 2023 C++: https://github.com/mugicha101/AdventOfCode23.git
 
 2022 Rust: https://github.com/mugicha101/AdventOfCode22Rust.git
+
+2020 C++: https://github.com/mugicha101/AdventOfCode20.git
